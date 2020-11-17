@@ -1,0 +1,120 @@
+
+<!DOCTYPE HTML>
+<!--
+	Escape Velocity by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>OnAir</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link href="/static/assets/css/main.css" rel="stylesheet">
+		
+		<!-- Login -->
+		<div>
+			<!-- {% if session.get('logflag') %}
+				<h1><a href="/logout">Logout</a></h1>
+				<h1><a href="/cctv_register_Form">카메라 등록</a></h1>
+				<h1><a href="/xx">cctv 등록</a></h1>
+				{% if session.get('userid') == 'k' %}
+					관리자입니다.
+					<h1><a href="/Member_Management">회원 관리</a></h1>
+				{% else %}
+					구매자입니다.
+					<h1><a href="/cctv_Management">카메라 관리</a></h1>
+				{% endif %}
+			{% else %}
+				사용자입니다.
+				<h1><a href="/login">Login</a></h1>
+				<h1><a href="/SignUp">SignUp</a></h1>
+			{% endif %}  -->
+			<!--<h1>{{resultData[0]}}</h1>-->
+			<!-- <h1>{{ resultData.latitude }}</h1>
+			<h1>{{ resultData[1][1] }}</h1>
+			<h1>{{ resultData}}</h1> -->
+			
+		</div>
+
+		<!--<link rel="stylesheet" href="{{ url_for('static', filename='assets/css/main.css') }}" />-->
+	</head>
+	<style>
+        #test {
+            width: 640px;
+            height: 480px;
+            overflow: hidden;
+        }
+
+        #ifrm {
+            width: 100%;
+            height: 100%;
+            transform: rotate(180deg);
+        }
+    </style>
+
+	<body class="homepage is-preload">
+		<div id="page-wrapper">
+
+			<!-- Header -->
+				<section id="header" class="wrapper">
+
+					
+
+					<!-- Logo -->
+						<div id="logo">
+							<h1><a href="/">ONAIR</a></h1>
+							<p></p>
+						</div>
+
+					<!-- Nav -->
+						
+
+				</section>
+
+			<!-- Intro -->
+				<section id="intro" class="wrapper style1">
+					<div class="title">CCTV</div>
+					<div class="container">
+						<p class="style1"></p>
+						
+							
+							<div id="map" style="width:auto;height:1000px;"></div>
+							
+						
+					</div>
+				</section>
+
+			
+			<!-- Footer -->
+				<section id="footer" class="">
+
+						<div class="row">
+							
+						</div>
+						<div id="copyright">
+							<ul>
+								<li>&copy; 김검정.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+							</ul>
+						</div>
+					
+				</section>
+
+		</div>
+		<!-- Scripts -->
+		<!--
+			<script src="{{ url_for('static', filename='assets/js/jquery.min.js') }}"></script>
+			<script src="{{ url_for('static', filename='assets/js/jquery.dropotron.min.js') }}"></script>
+			<script src="{{ url_for('static', filename='assets/js/browser.min.js') }}"></script>
+			<script src="{{ url_for('static', filename='assets/js/breakpoints.min.js') }}"></script>
+			<script src="{{ url_for('static', filename='assets/js/util.js') }}"></script>
+			<script src="{{ url_for('static', filename='assets/js/main.js') }}"></script>
+		-->
+		<script src="/static/assets/js/jquery.min.js"></script>
+		<script src="/static/assets/js/jquery.dropotron.min.js"></script>
+		<script src="/static/assets/js/browser.min.js"></script>
+		<script src="/static/assets/js/breakpoints.min.js"></script>
+		<script src="/static/assets/js/util.js"></script>
+		<script src="/static/assets/js/main.js"></script>
+	</body>
+</html>
