@@ -1,0 +1,767 @@
+<!DOCTYPE HTML>
+<!--
+	Hyperspace by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>OnAir</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+        <link rel="stylesheet" href="/static/css/main.css" />
+        <link rel="stylesheet" href="/static/css/search.css">
+        <noscript><link rel="stylesheet" href="/static/css/noscript.css" /></noscript>
+        
+
+	</head>
+	<body class="is-preload">
+
+		<!-- Sidebar -->
+			<section id="sidebar">
+				<div class="inner">
+					<nav>
+						<ul>
+                            {% if session.get('logflag') %}
+                                <li>{{session_data}}님 반갑습니다.</li>
+                            {% endif %}
+                            <li><a href="#intro">메인</a></li>
+                            <!--로그인이 안되어있을때-->
+                            {% if session.get('logflag') != True %}
+
+                            <!-- <li><a href="/login"
+								onclick="window.open(this.href,'_blank','width=900px, height=400px, toolbars=no, scrollbars=no'); return false;">Login</a>
+                            </li> -->
+                            
+                            <li><a href="/login">Login</a></li>
+                              
+                            {% endif %}
+                            <li><a href="#map_view">지도</a></li>
+                            <!--로그인 성공시-->
+                            {% if session.get('logflag') %}
+                                <li><a href="/logout">로그아웃</a></li>
+                                <!--관리자 아이디로 로그인한 경우
+                                나중에 관리자 아이디 수정하기.-->
+                                {% if session.get('userid') == 'admin' %}
+                                <li><a href="#Manager_cctv_Management">회원용 CCTV 관리</a></li>
+                                <!--일반 구매자 아이디로 로그인한 경우-->
+                                {% else %}
+                                <li><a href="#cctv_register_Form">CCTV 등록</a></li>
+                                <li><a href="#cctv_Management">내 CCTV 관리</a></li>
+                                {% endif %}
+                            {% endif %}
+                            <li><a href="#board">게시판</a></li>
+                            <li><a href="#inquire">문의하기</a></li>
+						</ul>
+					</nav>
+				</div>
+			</section>
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+				<!-- Intro -->
+                <section id="intro" class="wrapper style1 fullscreen fade-up">
+                    <div class="inner">
+                        <h1>누구나 쉽게 설치 가능한 </h1>
+                        <h1>Open CCTV</h1>
+                        <p>CCTV를 누구나 쉽게 설치할 수 있도록 간단하게 만들어<br />
+                            저렴한 디바이스 패키지 구축 및 실시간 스트리밍이 가능한 웹사이트.</p>
+                        <ul class="actions">
+                        </ul>
+                    </div>
+                </section>
+
+				<!-- map_view -->
+					<section id="map_view" class="wrapper style3 fade-up"  style="padding-top:5%;">
+						<div class="inner">
+                            <h1 style="border-top:5px double white; border-bottom:5px double white; text-align:center;">CCTV</h1>
+                            <div id="map1" style="width:80%; height:700px; border-radius:5%; margin:auto;"></div>
+                            <div style="padding-bottom:5%;"></div>
+				            <script type="text/javascript"
+                            src="api 키 값"></script>
+				
+                            <!-- <script class="style2" src=/static/js/map_view.js"></script> -->
+
+                            <!--cctv 정보가 들어있을 경우-->
+                            {% if resultData != 'None' %}
+                            <script>
+                                var result = {{resultData | tojson}}; //감사합니다. ㅜㅠㅜㅠㅜ 배열값 넘겨받아서 새로운 배열에 대입.-> 사용하기 쉽게할려고
+                                var container1 = document.getElementById('map1');
+
+                                var options1 = {
+                                    center: new kakao.maps.LatLng(36.628788427953396, 127.45624699710056),
+                                    level: 3
+                                };
+                                var map1 = new kakao.maps.Map(container1, options1);
+
+                                var imageSrc1 = "{{ url_for('static', filename='images/camera.png') }}", // 마커이미지의 주소입니다    
+                                    imageSize1 = new kakao.maps.Size(64, 69), // 마커이미지의 크기입니다
+                                    imageOption1 = {
+                                        offset: new kakao.maps.Point(27, 69)
+                                    }; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
+
+                                // 마커의 이미지정보를 가지고 있는 마커이미지를 생성합니다********************************
+                                var markerImage1 = new kakao.maps.MarkerImage(imageSrc1, imageSize1, imageOption1);
+
+                                var markerPosition = new Array();
+                                var iwContent = new Array();
+
+
+                                for (var i in result) {
+                                    markerPosition[i] = new kakao.maps.LatLng(result[i][1], result[i][2]); // 마커가 표시될 위치입니다
+
+                                    // 마커를 생성합니다
+                                    var marker1 = new kakao.maps.Marker({
+                                        position: markerPosition[i],
+                                        image: markerImage1,
+                                        map: map1,
+                                        clickable: true // 마커를 클릭했을 때 지도의 클릭 이벤트가 발생하도록 설정합니다
+                                    });
+
+                                    // *************************마커를 클릭했을 때 마커 위에 표시할 인포윈도우를 생성합니다 ***********************************************
+                                    var cctv_url = result[i][3];
+
+                                    //건든거
+                                    iwContent[i] = '<div id="mask94" name="test_iframe"><iframe name="iframe_test" scrolling="no" frameborder="0" id="ifrm" src="' + cctv_url + '" marginwidth="0" marginheight="0"></iframe></div>', // 인포윈도우에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
+                                        iwRemoveable = true; // removeable 속성을 ture 로 설정하면 인포윈도우를 닫을 수 있는 x버튼이 표시됩니다
+                                    //iwContent[i] = '<div style="text-color:black">텃밭</div>';  //인포윈도우에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
+                                    //document.write(iwContent[i]);
+
+                                    var infowindow1 = new kakao.maps.InfoWindow({
+                                        content: iwContent[i], // 인포윈도우에 표시할 내용
+                                        position: markerPosition[i],
+                                        removable: iwRemoveable
+                                    });
+                                    // 마커에 이벤트를 등록하는 함수 만들고 즉시 호출하여 클로저를 만듭니다
+                                    // 클로저를 만들어 주지 않으면 마지막 마커에만 이벤트가 등록됩니다'
+
+                                    (function (marker1, infowindow1) {
+                                        // 마커에 mouseover 이벤트를 등록하고 마우스 오버 시 인포윈도우를 표시합니다 
+                                        kakao.maps.event.addListener(marker1, 'click', function () {
+                                            infowindow1.open(map1, marker1);
+                                        });
+                                    })(marker1, infowindow1);
+                                }
+                            </script>
+                            <!--권한이 있는 CCTV가 없는 경우-->
+                            {% else %}
+                                <script>
+                                    var container1 = document.getElementById('map1');
+
+                                    var options1 = {
+                                        center: new kakao.maps.LatLng(36.628788427953396, 127.45624699710056),
+                                        level: 3
+                                    };
+                                    var map1 = new kakao.maps.Map(container1, options1);
+
+                                    var imageSrc1 = "{{ url_for('static', filename='images/camera.png') }}", // 마커이미지의 주소입니다    
+                                        imageSize1 = new kakao.maps.Size(64, 69), // 마커이미지의 크기입니다
+                                        imageOption1 = {offset: new kakao.maps.Point(27, 69)}; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
+                                </script>
+                            {% endif %}
+						</div>
+                    </section>
+
+                    <!--로그인 성공시-->
+                    {% if session.get('logflag') %}
+                        <!--관리자 아이디로 로그인한 경우
+                        나중에 관리자 아이디 수정하기.-->
+                        {% if session.get('userid') == 'admin' %}
+                        <!--관리자가 회원의 CCTV 관리-->
+                            <!--CCTV 정보가 있을 때-->
+                            <section id="Manager_cctv_Management" class= "wrapper style1 fade-up">
+                                <table>
+                                    <tr>
+                                        <th>*권한 X</th>
+                                    </tr>
+                                    <tr>
+                                        <th>NUM</th>
+                                        <th>ID</th>
+                                        <th>CCTV_NAME</th>
+                                        <th>CCTV_CHECK</th>
+                                    </tr>
+
+                                    <tbody> 
+                                        <script>
+                                            var result0 = {{resultData0 | tojson}};
+                                            var num = 1;
+
+                                            for (var i in result0) {
+                                                var url0 = result0[i][3];
+
+                                                document.write('<form>');
+
+                                                document.write('<tr>');
+                                                //document.write('<td>hi</td>');
+                                                document.write('<td>' + num + '</td>');
+                                                document.write('<td><input type = "text" name = "mem_id" value = "' + result0[i][0] + '" readonly></td>');
+                                                document.write('<td><input type = "text" name = "cctv_name" value = "' + result0[i][1] + '" readonly></td>');
+                                                document.write('<td><input type = "text" name = "cctv_check" value = "' + result0[i][2] + '" readonly></td>');
+                                                //document.write('<td><button onclick="location.href="'+result1[i][3]+'"">영상보기</button></td>')
+                                                document.write('<td><a href="' + url0 + '" target = "_blank">영상 확인</a></td>')
+                                                document.write('<td><button type="submit" formaction="/Authorization" formmethod="POST">권한주기</button></td>');
+                                                document.write('</tr>');
+
+                                                document.write('</form>');
+                                                num++;
+                                            }
+                                        </script>
+                                    </tbody>
+                                </table>
+
+                                <table>
+                                    <tr>
+                                        <th>*권한 O</th>
+                                    </tr>
+                                    <tr>
+                                        <th>NUM</th>
+                                        <th>ID</th>
+                                        <th>CCTV_NAME</th>
+                                        <th>CCTV_CHECK</th>
+                                    </tr>
+
+                                    <tbody>
+                                        <script>
+                                            var result1 = {{resultData1 | tojson}};
+                                            var num = 1;
+
+                                            for (var i in result1) {
+                                                var url1 = result1[i][3];
+
+                                                document.write('<form>');
+
+                                                document.write('<tr>');
+                                                //document.write('<td>hi</td>');
+                                                document.write('<td>' + num + '</td>');
+                                                document.write('<td><input type = "text" name = "mem_id" value = "' + result1[i][0] + '" readonly></td>');
+                                                document.write('<td><input type = "text" name = "cctv_name" value = "' + result1[i][1] + '" readonly></td>');
+                                                document.write('<td><input type = "text" name = "cctv_check" value = "' + result1[i][2] + '" readonly></td>');
+                                                //document.write('<td><button onclick="location.href="'+result1[i][3]+'"">영상보기</button></td>')
+                                                document.write('<td><a href="' + url1 + '" target = "_blank">영상 확인</a></td>')
+                                                document.write('<td><button type="submit" formaction="/Authorization" formmethod="POST">권한박탈</button></td>');
+                                                document.write('</tr>');
+
+                                                document.write('</form>');
+                                                num++;
+                                            }
+                                        </script>
+                                    </tbody>
+                                </table>
+                            </section>
+                        <!--일반 구매자 아이디로 로그인한 경우-->
+                        {% else %}
+                            <!--CCTV 등록-->
+                            <section id="cctv_register_Form" class="wrapper style2 fade-up">
+                                <div class="split style1" style="padding-top:10%; padding-bottom:10%">
+                                    <section style="margin:auto;">
+                                        <div class="map_wrap">
+                                            <div id="map"
+                                                style="border-radius:3%; width:100%;height:100%;position:relative;overflow:hidden; color:black; ">
+                                            </div>
+                            
+                                            <div id="menu_wrap" class="bg_white" style="color:black;">
+                                                <div class="option">
+                                                    <div>
+                                                        <form onsubmit="searchPlaces(); return false;">
+                                                            키워드 <input type="text" value="충북대학교" id="keyword" size="15"
+                                                                style="border:1px solid black;">
+                                                            <button type="submit"
+                                                                style="color:black; border:1px solid black; border-radius:10px; height:30px; line-height: 0;">검색하기</button>>검색하기</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                                <hr>
+                                                <ul id="placesList"></ul>
+                                                <div id="pagination"></div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                    <section style="margin:auto;">
+                                        <div class="login">
+                                            <h1 align="center">CCTV 등록</h1>
+                                            <form action="/cctv_insert" method="POST">
+                                                <!-- <form action = "/search_test" method="POST"> -->
+                            
+                                                <div class="fields">
+                                                    <div class="field half">
+                                                        <label for="unique_num">고유번호</label>
+                                                        <input type="text" name="unique_num" placeholder="고유번호">
+                                                    </div>
+                                                    <div class="field half">
+                                                        <label for="cctv_name">cctv 이름</label>
+                                                        <input type="text" name="cctv_name" placeholder="cctv_name">
+                            
+                                                    </div>
+                                                    <div class="field half">
+                                                        <label for="cctv_name">위도</label>
+                                                        <input type="text" id="Latitude" name="latitude" placeholder="latitude">
+                                                    </div>
+                            
+                                                    <div class="field half">
+                                                        <label for="cctv_name">경도</label>
+                                                        <input type="text" id="Longitude" name="longitude" placeholder="Longitude">
+                                                    </div>
+                                                    <!--**********나중에 빼야함**********-->
+                                                    <!--<input type="text" name="url" placeholder="url"> -->
+                                                    <!--**********나중에 빼야함**********-->
+                                                    <button type="submit" class="btn btn-primary btn-block btn-large"
+                                                        style="margin:5% auto;">등록하기.</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <script type="text/javascript" src="api 키값"></script>
+                                        
+                                        <!---->
+                                        <!-- <script src="/static/js/search.js"></script> -->
+
+                                        <script>
+                                            // 마커를 담을 배열
+                                            var markers = [];
+
+                                            var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+                                                mapOption = {
+                                                    center: new kakao.maps.LatLng(37.566826, 126.9786567), // 지도의 중심좌표
+                                                    level: 3 // 지도의 확대 레벨
+                                                };
+
+                                            // 지도를 생성합니다    
+                                            var map = new kakao.maps.Map(mapContainer, mapOption);
+
+                                            // 지도를 클릭한 위치에 표출할 마커
+                                            var marker_cl = new kakao.maps.Marker({
+                                                // 지도 중심좌표에 마커를 생성
+                                                position: map.getCenter()
+                                            });
+                                            // 지도에 마커를 표시
+                                            marker_cl.setMap(map);
+
+
+                                            // 장소 검색 객체를 생성
+                                            var ps = new kakao.maps.services.Places();
+
+                                            // 검색 결과 목록이나 마커를 클릭했을 때 장소명을 표출할 인포윈도우를 생성
+                                            var infowindow = new kakao.maps.InfoWindow({ zIndex: 1 });
+
+                                            // 키워드로 장소를 검색
+                                            searchPlaces();
+
+                                            // 키워드 검색을 요청하는 함수
+                                            function searchPlaces() {
+
+                                                var keyword = document.getElementById('keyword').value;
+
+                                                if (!keyword.replace(/^\s+|\s+$/g, '')) {
+                                                    alert('키워드를 입력해주세요!');
+                                                    return false;
+                                                }
+
+                                                // 장소검색 객체를 통해 키워드로 장소검색을 요청
+                                                ps.keywordSearch(keyword, placesSearchCB);
+                                            }
+
+                                            // 장소검색이 완료됐을 때 호출되는 콜백함수
+                                            function placesSearchCB(data, status, pagination) {
+                                                if (status === kakao.maps.services.Status.OK) {
+
+                                                    // 정상적으로 검색이 완료됐으면
+                                                    // 검색 목록과 마커를 표출
+                                                    displayPlaces(data);
+
+                                                    // 페이지 번호를 표출
+                                                    displayPagination(pagination);
+
+                                                } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
+
+                                                    alert('검색 결과가 존재하지 않습니다.');
+                                                    return;
+
+                                                } else if (status === kakao.maps.services.Status.ERROR) {
+
+                                                    alert('검색 결과 중 오류가 발생했습니다.');
+                                                    return;
+
+                                                }
+                                            }
+
+                                            // 검색 결과 목록과 마커를 표출하는 함수
+                                            function displayPlaces(places) {
+
+                                                var listEl = document.getElementById('placesList'),
+                                                    menuEl = document.getElementById('menu_wrap'),
+                                                    fragment = document.createDocumentFragment(),
+                                                    bounds = new kakao.maps.LatLngBounds(),
+                                                    listStr = '';
+
+                                                // 검색 결과 목록에 추가된 항목들을 제거
+                                                removeAllChildNods(listEl);
+
+                                                // 지도에 표시되고 있는 마커를 제거
+                                                removeMarker();
+
+                                                for (var i = 0; i < places.length; i++) {
+
+                                                    // 마커를 생성하고 지도에 표시
+                                                    var placePosition = new kakao.maps.LatLng(places[i].y, places[i].x),
+                                                        marker = addMarker(placePosition, i),
+                                                        itemEl = getListItem(i, places[i]); // 검색 결과 항목 Element를 생성
+
+                                                    // 검색된 장소 위치를 기준으로 지도 범위를 재설정하기위해
+                                                    // LatLngBounds 객체에 좌표를 추가
+                                                    bounds.extend(placePosition);
+
+                                                    // 마커와 검색결과 항목에 mouseover 했을을때
+                                                    // 해당 장소에 인포윈도우에 장소명을 표시
+                                                    // mouseout 했을 때는 인포윈도우를 닫음
+                                                    (function (marker, title) {
+                                                        kakao.maps.event.addListener(marker, 'mouseover', function () {
+                                                            displayInfowindow(marker, title);
+                                                        });
+
+                                                        kakao.maps.event.addListener(marker, 'mouseout', function () {
+                                                            infowindow.close();
+                                                        });
+
+                                                        itemEl.onmouseover = function () {
+                                                            displayInfowindow(marker, title);
+                                                        };
+
+                                                        itemEl.onmouseout = function () {
+                                                            infowindow.close();
+                                                        };
+                                                    })(marker, places[i].place_name);
+
+                                                    fragment.appendChild(itemEl);
+                                                }
+
+                                                kakao.maps.event.addListener(map, 'click', function (mouseEvent) {
+
+                                                    // 검색 결과 목록에 추가된 항목들을 제거
+                                                    removeAllChildNods(listEl);
+                                                    // 지도에 표시되고 있는 마커를 제거
+                                                    removeMarker();
+                                                    // 클릭한 위도, 경도 정보를 가져옴
+                                                    var latlng = mouseEvent.latLng;
+                                                    // 마커 위치를 클릭한 위치로 옮김
+                                                    marker_cl.setPosition(latlng);
+
+                                                    var message1 = latlng.getLat();
+                                                    var message2 = latlng.getLng();
+
+                                                    //var resultDiv = document.getElementById('Latitude');
+                                                    //resultDiv.innerHTML = message1;
+                                                    
+                                                    //var resultDiv = document.getElementById('Longitude');
+                                                    //resultDiv.innerHTML = message2;
+
+                                                    document.getElementById('Latitude').value = message1;
+                                                    document.getElementById('Longitude').value = message2;
+                                                });
+
+                                                // 검색결과 항목들을 검색결과 목록 Elemnet에 추가
+                                                listEl.appendChild(fragment);
+                                                menuEl.scrollTop = 0;
+
+                                                // 검색된 장소 위치를 기준으로 지도 범위를 재설정
+                                                map.setBounds(bounds);
+                                            }
+
+                                            // 검색결과 항목을 Element로 반환하는 함수
+                                            function getListItem(index, places) {
+
+                                                var el = document.createElement('li'),
+                                                    itemStr = '<span class="markerbg marker_' + (index + 1) + '"></span>' +
+                                                        '<div class="info">' +
+                                                        '   <h5>' + places.place_name + '</h5>';
+
+                                                if (places.road_address_name) {
+                                                    itemStr += '    <span>' + places.road_address_name + '</span>' +
+                                                        '   <span class="jibun gray">' + places.address_name + '</span>';
+                                                } else {
+                                                    itemStr += '    <span>' + places.address_name + '</span>';
+                                                }
+
+                                                itemStr += '  <span class="tel">' + places.phone + '</span>' +
+                                                    '</div>';
+
+                                                el.innerHTML = itemStr;
+                                                el.className = 'item';
+
+                                                return el;
+                                            }
+
+                                            // 마커를 생성하고 지도 위에 마커를 표시하는 함수
+                                            function addMarker(position, idx, title) {
+                                                var imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_number_blue.png', // 마커 이미지 url, 스프라이트 이미지를 씁니다
+                                                    imageSize = new kakao.maps.Size(36, 37),  // 마커 이미지의 크기
+                                                    imgOptions = {
+                                                        spriteSize: new kakao.maps.Size(36, 691), // 스프라이트 이미지의 크기
+                                                        spriteOrigin: new kakao.maps.Point(0, (idx * 46) + 10), // 스프라이트 이미지 중 사용할 영역의 좌상단 좌표
+                                                        offset: new kakao.maps.Point(13, 37) // 마커 좌표에 일치시킬 이미지 내에서의 좌표
+                                                    },
+                                                    markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imgOptions),
+                                                    marker = new kakao.maps.Marker({
+                                                        position: position, // 마커의 위치
+                                                        image: markerImage
+                                                    });
+
+                                                marker.setMap(map); // 지도 위에 마커를 표출
+                                                markers.push(marker);  // 배열에 생성된 마커를 추가
+
+                                                return marker;
+                                            }
+
+                                            // 지도 위에 표시되고 있는 마커를 모두 제거
+                                            function removeMarker() {
+                                                for (var i = 0; i < markers.length; i++) {
+                                                    markers[i].setMap(null);
+                                                }
+                                                markers = [];
+                                            }
+
+                                            // 검색결과 목록 하단에 페이지번호를 표시는 함수
+                                            function displayPagination(pagination) {
+                                                var paginationEl = document.getElementById('pagination'),
+                                                    fragment = document.createDocumentFragment(),
+                                                    i;
+
+                                                // 기존에 추가된 페이지번호를 삭제
+                                                while (paginationEl.hasChildNodes()) {
+                                                    paginationEl.removeChild(paginationEl.lastChild);
+                                                }
+
+                                                for (i = 1; i <= pagination.last; i++) {
+                                                    var el = document.createElement('a');
+                                                    el.href = "#";
+                                                    el.innerHTML = i;
+
+                                                    if (i === pagination.current) {
+                                                        el.className = 'on';
+                                                    } else {
+                                                        el.onclick = (function (i) {
+                                                            return function () {
+                                                                pagination.gotoPage(i);
+                                                            }
+                                                        })(i);
+                                                    }
+
+                                                    fragment.appendChild(el);
+                                                }
+                                                paginationEl.appendChild(fragment);
+                                            }
+
+                                            // 검색결과 목록 또는 마커를 클릭했을 때 호출되는 함수
+                                            // 인포윈도우에 장소명을 표시
+                                            function displayInfowindow(marker, title) {
+                                                var content = '<div style="padding:5px;z-index:1;">' + title + '</div>';
+
+                                                infowindow.setContent(content);
+                                                infowindow.open(map, marker);
+                                            }
+
+                                            // 검색결과 목록의 자식 Element를 제거하는 함수
+                                            function removeAllChildNods(el) {
+                                                while (el.hasChildNodes()) {
+                                                    el.removeChild(el.lastChild);
+                                                }
+                                            }
+                                        </script>
+                                    </section>
+                                </div>
+                            </section>
+
+                            <!--구매자 자신의 CCTV 정보-->
+                            <!-- {% if cctv_Data  != 'None' %} -->
+                            <!--CCTV 정보가 있을 때-->
+                            <section id="cctv_Management" class="wrapper style1 fade-up">
+                                <table>
+                                    <tr>
+                                        <th>num</th>
+                                        <th>cctv_name</th>
+                                        <th>위도</th>
+                                        <th>경도</th>
+                                        <th>수정</th>
+                                        <th>삭제</th>
+                                    </tr>
+                                    
+                                    <form>
+                                        <tbody id="table1">
+                                            <script>
+                                                var cctv_result = {{cctv_Data | tojson}};
+                                                var num = 1;
+                        
+                                                for(var i in cctv_result)
+                                                {
+                                                    document.write('<tr>');
+                                                    //document.write('<td>hi</td>');
+                                                    document.write('<td>'+num+'</td>');
+                                                    document.write('<td><input type = "text" name = "cctv_name" value = "' +cctv_result[i][0]+'" readonly></td>');
+                                                    document.write('<td><input type = "text" name = "latitude" value = "' +cctv_result[i][1]+'" readonly></td>');
+                                                    document.write('<td><input type = "text" name = "longitude" value = "' +cctv_result[i][2]+'" readonly></td>');
+                                                    document.write('<td><button type="submit" formaction="/cctv_modify_Form" formmethod="post">수정</button></td>');
+                                                    document.write('<td><button type="submit" formaction="/delete_cctv" formmethod="post">삭제</button></td>');
+                                                    document.write('</tr>');
+                                                    num++;
+                                                }
+                                            </script>
+                                        </tbody>
+                                    </form>
+                                </table>
+                            </section>
+                            <!-- {% else %}
+                            <section id="cctv_Management" class="wrapper style1 fade-up">
+                                <p>구매자 - CCTV 정보가 없습니다.</p>
+                            </section>
+                            {% endif %} -->
+                        {% endif %}
+                    {% endif %}
+
+				<!-- board -->
+					<section id="board" class="wrapper style1 fade-up">
+						<div class="inner">
+							<script type="text/javascript">
+								function goUrl(url) {
+									location.href = url;
+								}
+                            </script>
+
+                            <table class="boradvieww">
+                                <h2 align="center">게시판 목록</h2>
+                            
+                                <thead>
+                                    <tr>
+                                        <th>번호</th>
+                                        <th>제목</th>
+                                        <th>CCTV_NAME</th>
+                                        <th>구매자 ID</th>
+                                        <!-- <th>조회수</th> -->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if resultData != 'None' %}
+                                    <script>
+                                        var board_result = {{resultData | tojson}};
+                                        var num = 1;
+                
+                                        for(var i in board_result)
+                                        {
+                                            document.write('<tr>');
+                                            //document.write('<td>hi</td>');
+                                            document.write('<td align="center">'+num+'</td>');
+                                            document.write('<td align="center">CCTV 등록 완료!</td>');
+                                            document.write('<td align="center">' +board_result[i][4]+'</td>');
+                                            document.write('<td align="center">' +board_result[i][6]+'</td>');
+                                            document.write('</tr>');
+                                            num++;
+                                        }
+                                    </script>
+                                    {% else %}
+                                    <tr>
+                                        <td align="center" colspan="5">등록된 게시물이 없습니다.</td>
+                                    </tr>
+                                    {% endif %}
+                                    <!-- <tr>
+                                        <td>1</td>
+                                        <td><a href="/board/boardView.html"
+                                                onclick="window.open(this.href,'_blank','width=900px, height=400px, toolbars=no, scrollbars=no'); return false;">동해물과
+                                                백두산이 마르고 닳도록 하...</a></td>
+                                        <td align="center">김연석</td>
+                                        <td align="center">2013.06.24</td>
+                                        <td align="center">10</td>
+                                    </tr> -->
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td align="center" colspan="5">1</td>
+                                    </tr>
+                                </tfoot>
+                            
+                            </table align="center">
+                            <div class="boradvieww1">
+                                <input type="button" value="목록" onclick="goUrl('/board/boardList.html');" />
+                                <!-- <input type="button" value="글쓰기" onclick="goUrl('/board/boardWriteForm.html');" /> -->
+                            </div>
+						</div>
+					</section>
+                    
+                    <!-- 문의하기 -->
+                    <section id="inquire" class="wrapper style2 fade-up">
+						<div class="inner">
+							<h2>문의하기</h2>
+							<p>궁금하신게 있으시다면 문의해주세요 :)</p>
+							<div class="split style1">
+								<section>
+									<form name="formmail" method="post" action="/data">
+										<div class="fields">
+											<div class="field half">
+												<label for="name">제목</label>
+												<input type="text" name="email_title" />
+											</div>
+											<div class="field half">
+												<label for="email">이메일</label>
+												<input type="text" name="email_receiver"/>
+											</div>
+											<div class="field">
+												<label for="body">내용</label>
+												<textarea name="email_content" rows="5"></textarea>
+											</div>
+										</div>
+										<ul class="actions">
+											<li><a onclick="reset();" class="button submit" >보내기</a></li>
+										</ul>
+									</form>
+								</section>
+								<section>
+									<ul class="contact">
+										<li>
+											<h3>Address</h3>
+											<span>충청북도 청주시 서원구 충대로1<br />
+												청주시, 043-261-2114<br />
+												한국</span>
+										</li>
+										<li>
+											<h3>Email</h3>
+											<a href="#">dh73111@naver.com</a>
+										</li>
+										<li>
+											<h3>Phone</h3>
+											<span>(010) 3786 - 1907</span>
+										</li>
+										<li>
+											<h3>Social</h3>
+											<ul class="icons">
+												<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+												<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a>
+												</li>
+												<li><a href="#" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+												<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a>
+												</li>
+												<li><a href="#" class="icon brands fa-linkedin-in"><span class="label">LinkedIn</span></a>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</section>
+							</div>
+						</div>
+					</section>
+
+		<!-- Footer -->
+			<footer id="footer" class="wrapper style1-alt">
+				<div class="inner">
+					<ul class="menu">
+						<li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+					</ul>
+				</div>
+			</footer>
+
+		<!-- Scripts -->
+			<script src="/static/js/jquery.min.js"></script>
+			<script src="/static/js/jquery.scrollex.min.js"></script>
+			<script src="/static/js/jquery.scrolly.min.js"></script>
+			<script src="/static/js/browser.min.js"></script>
+			<script src="/static/js/breakpoints.min.js"></script>
+			<script src="/static/js/util.js"></script>
+			<script src="/static/js/main.js"></script>
+
+	</body>
+</html>

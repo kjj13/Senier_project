@@ -1,0 +1,284 @@
+<!DOCTYPE HTML>
+<!--
+	Hyperspace by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>OnAir</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+        <link rel="stylesheet" href="/static/css/main.css" />
+        <link rel="stylesheet" href="/static/css/search.css" >
+        <noscript><link rel="stylesheet" href="/static/css/noscript.css" /></noscript>
+        
+        <!-- <h1>{{resultData}}</h1> -->
+
+	</head>
+	<body class="is-preload">
+
+		<!-- Sidebar -->
+			<section id="sidebar">
+				<div class="inner">
+					<nav>
+						<ul>
+                            <li><a href="#intro">메인</a></li>
+                            <!--로그인이 안되어있을때-->
+							<!-- <li><a href="/login"
+								onclick="window.open(this.href,'_blank','width=900px, height=400px, toolbars=no, scrollbars=no'); return false;">Login</a>
+							</li> -->
+							<li><a href="#map_view">지도</a></li>
+							<li><a href="/login">Login</a></li>
+							<li><a href="#board">게시판</a></li>
+							<li><a href="#inquire">문의하기</a></li>
+						</ul>
+					</nav>
+				</div>
+			</section>
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Intro -->
+				<section id="intro" class="wrapper style1 fullscreen fade-up">
+					<div class="inner">
+						<h1>누구나 쉽게 설치 가능한 </h1>
+						<h1>Open CCTV</h1>
+						<p>CCTV를 누구나 쉽게 설치할 수 있도록 간단하게 만들어<br />
+							저렴한 디바이스 패키지 구축 및 실시간 스트리밍이 가능한 웹사이트.</p>
+						<ul class="actions">
+						</ul>
+					</div>
+				</section>
+
+				<!-- map_view -->
+					<section id="map_view" class="wrapper style3 fade-up" style="padding-top:5%;">
+						<div class="inner">
+							<h1 style="border-top:5px double white; border-bottom:5px double white; text-align:center;">CCTV</h1>
+                            <div id="map" style="width:80%; height:700px; border-radius:5%; margin:auto;"></div>
+							<div style="padding-bottom:5%;"></div>
+
+				            <script type="text/javascript"
+							src="api 키 값"></script>
+				
+                            <!-- <script class="style2" src=/static/js/map_view.js"></script> -->
+                            <!--cctv 정보가 들어있지 않은 경우-->
+							{% if resultData == 'None' %}
+								<script>
+									var container = document.getElementById('map');
+
+									var options = {
+										center: new kakao.maps.LatLng(36.628788427953396, 127.45624699710056),
+										level: 3
+									};
+									var map = new kakao.maps.Map(container, options);
+								</script>
+							<!--cctv 정보가 들어있을 경우-->
+							{% else %}
+								<script>
+									var result = {{resultData | tojson}}; //감사합니다. ㅜㅠㅜㅠㅜ 배열값 넘겨받아서 새로운 배열에 대입.-> 사용하기 쉽게할려고
+									var container = document.getElementById('map');
+
+									var options = {
+										center: new kakao.maps.LatLng(36.628788427953396, 127.45624699710056),
+										level: 3
+									};
+									var map = new kakao.maps.Map(container, options);
+
+									var imageSrc = "{{ url_for('static', filename='images/camera.png') }}", // 마커이미지의 주소입니다    
+										imageSize = new kakao.maps.Size(64, 69), // 마커이미지의 크기입니다
+										imageOption = {
+											offset: new kakao.maps.Point(27, 69)
+										}; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
+
+									// 마커의 이미지정보를 가지고 있는 마커이미지를 생성합니다********************************
+									var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
+
+									var markerPosition = new Array();
+									var iwContent = new Array();
+
+
+									for (var i in result) {
+										markerPosition[i] = new kakao.maps.LatLng(result[i][1], result[i][2]); // 마커가 표시될 위치입니다
+
+										// 마커를 생성합니다
+										var marker = new kakao.maps.Marker({
+											position: markerPosition[i],
+											image: markerImage,
+											map: map,
+											clickable: true // 마커를 클릭했을 때 지도의 클릭 이벤트가 발생하도록 설정합니다
+										});
+
+										// *************************마커를 클릭했을 때 마커 위에 표시할 인포윈도우를 생성합니다 ***********************************************
+										var url = result[i][3];
+
+										//건든거
+										iwContent[i] = '<div id="mask94" name="test_iframe"><iframe name="iframe_test" scrolling="no" frameborder="0" id="ifrm" src="' + url + '" marginwidth="0" marginheight="0"></iframe></div>', // 인포윈도우에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
+											iwRemoveable = true; // removeable 속성을 ture 로 설정하면 인포윈도우를 닫을 수 있는 x버튼이 표시됩니다
+										//iwContent[i] = '<div style="text-color:black">텃밭</div>';  //인포윈도우에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
+										//document.write(iwContent[i]);
+
+										var infowindow = new kakao.maps.InfoWindow({
+											content: iwContent[i], // 인포윈도우에 표시할 내용
+											position: markerPosition[i],
+											removable: iwRemoveable
+										});
+										// 마커에 이벤트를 등록하는 함수 만들고 즉시 호출하여 클로저를 만듭니다
+										// 클로저를 만들어 주지 않으면 마지막 마커에만 이벤트가 등록됩니다'
+
+										(function (marker, infowindow) {
+											// 마커에 mouseover 이벤트를 등록하고 마우스 오버 시 인포윈도우를 표시합니다 
+											kakao.maps.event.addListener(marker, 'click', function () {
+												infowindow.open(map, marker);
+											});
+										})(marker, infowindow);
+									}
+								</script>
+							{% endif %}
+                            
+						</div>
+                    </section>
+
+                    <!-- board -->
+					<section id="board" class="wrapper style1 fade-up">
+						<div class="inner">
+							<script type="text/javascript">
+								function goUrl(url) {
+									location.href = url;
+								}
+                            </script>
+                            
+							<table class="boradvieww">
+								<h2 align="center">CCTV 등록 현황</h2>
+							
+								<thead>
+                                    <tr>
+                                        <th>번호</th>
+                                        <th>제목</th>
+                                        <th>CCTV_NAME</th>
+                                        <th>구매자 ID</th>
+                                        <!-- <th>조회수</th> -->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if resultData != 'None' %}
+                                    <script>
+                                        var board_result = {{resultData | tojson}};
+                                        var num = 1;
+                
+                                        for(var i in board_result)
+                                        {
+                                            document.write('<tr>');
+                                            //document.write('<td>hi</td>');
+                                            document.write('<td align="center">'+num+'</td>');
+                                            document.write('<td align="center">CCTV 등록 완료!</td>');
+                                            document.write('<td align="center">' +board_result[i][4]+'</td>');
+                                            document.write('<td align="center">' +board_result[i][6]+'</td>');
+                                            document.write('</tr>');
+                                            num++;
+                                        }
+                                    </script>
+                                    {% else %}
+                                    <tr>
+                                        <td align="center" colspan="5">등록된 게시물이 없습니다.</td>
+                                    </tr>
+                                    {% endif %}
+								</tbody>
+								<tfoot>
+									<tr>
+										<td align="center" colspan="5">1</td>
+									</tr>
+								</tfoot>
+							
+							</table align="center">
+							<div class="boradvieww1">
+								<input type="button" value="목록" onclick="goUrl('/board/boardList.html');" />
+								<!-- <input type="button" value="글쓰기" onclick="goUrl('/board/boardWriteForm.html');" /> -->
+							</div>
+						</div>
+					</section>
+					
+					<!-- 문의하기 -->
+					
+					<section id="inquire" class="wrapper style2 fade-up">
+						<div class="inner">
+							<h2>문의하기</h2>
+							<p>궁금하신게 있으시다면 문의해주세요 :)</p>
+							<div class="split style1">
+								<section>
+									<form name="formmail" method="post" action="/data1">
+										<div class="fields">
+											<div class="field half">
+												<label for="name">제목</label>
+												<input type="text" name="email_title" id="name" />
+											</div>
+											<div class="field half">
+												<label for="email">이메일</label>
+												<input type="text" name="email_receiver" id="email" />
+											</div>
+											<div class="field">
+												<label for="message">내용</label>
+												<textarea name="email_content" id="message" rows="5"></textarea>
+											</div>
+										</div>
+										<ul class="actions">
+											<li><a onclick="reset();" href="" class="button submit" >보내기</a></li>
+										</ul>
+									</form>
+								</section>
+								<section>
+									<ul class="contact">
+										<li>
+											<h3>Address</h3>
+											<span>충청북도 청주시 서원구 충대로1<br />
+												청주시, 043-261-2114<br />
+												한국</span>
+										</li>
+										<li>
+											<h3>Email</h3>
+											<a href="#">dh73111@naver.com</a>
+										</li>
+										<li>
+											<h3>Phone</h3>
+											<span>(010) 3786 - 1907</span>
+										</li>
+										<li>
+											<h3>Social</h3>
+											<ul class="icons">
+												<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+												<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a>
+												</li>
+												<li><a href="#" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+												<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a>
+												</li>
+												<li><a href="#" class="icon brands fa-linkedin-in"><span class="label">LinkedIn</span></a>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</section>
+							</div>
+						</div>
+					</section>
+
+		<!-- Footer -->
+			<footer id="footer" class="wrapper style1-alt">
+				<div class="inner">
+					<ul class="menu">
+						<li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">김검정</a></li>
+					</ul>
+				</div>
+			</footer>
+
+		<!-- Scripts -->
+			<script src="/static/js/jquery.min.js"></script>
+			<script src="/static/js/jquery.scrollex.min.js"></script>
+			<script src="/static/js/jquery.scrolly.min.js"></script>
+			<script src="/static/js/browser.min.js"></script>
+			<script src="/static/js/breakpoints.min.js"></script>
+			<script src="/static/js/util.js"></script>
+			<script src="/static/js/main.js"></script>
+
+	</body>
+</html>
