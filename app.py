@@ -22,7 +22,7 @@ mail = Mail(app)
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = 'rlawndwo123@gamil.com'
-app.config['MAIL_PASSWORD'] = 'Kj!2160427'
+app.config['MAIL_PASSWORD'] = ''
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
@@ -30,7 +30,7 @@ mail = Mail(app)
 # db = pymysql.connect(host='18.212.183.253',
 #                      port=3306,
 #                      user='jjoong',
-#                      passwd='1234',
+#                      passwd='',
 #                      db='pi',
 #                      charset='utf8')
 
@@ -46,7 +46,7 @@ def index():
     db = pymysql.connect(host='18.212.183.253',
                     port=3306,
                     user='jjoong',
-                    passwd='1234',
+                    passwd='',
                     db='pi',
                     charset='utf8')
 
@@ -70,7 +70,7 @@ def please():
     db = pymysql.connect(host='18.212.183.253',
                     port=3306,
                     user='jjoong',
-                    passwd='1234',
+                    passwd='',
                     db='pi',
                     charset='utf8')
 
@@ -111,19 +111,7 @@ def please():
                 db.close()
                 #관리자로 로그인 한 경우
                 if session['userid'] == 'admin':
-                    # check_sql = "SELECT mem_id ,cctv_name, cctv_check, url FROM cctv WHERE cctv_check = %s ORDER BY mem_id;"   
-                    
-                    # cursor.execute(check_sql,0)
-                    # Manager0_Data = cursor.fetchall()
-
-                    # #허용한 cctv정보들
-                    # cursor.execute(check_sql,1)
-                    # Manager1_Data = cursor.fetchall()
-                    # db.close()
-                    #return "관리자"
-                    #x = Manager0_Data + Manager1_Data
-                    #return str(x)
-                    # if not Manager0_Data
+                  
                     return render_template('final.html', session_data = session['userid'], resultData = row, resultData0 = Manager0_Data, resultData1 = Manager1_Data)
                 #일반 구매자로 로그인 한 경우
                 else:
@@ -205,8 +193,6 @@ def login():
 @app.route("/logout")
 def logout():
     session.clear()
-    #session.pop('logflag',False)
-    #session.pop('userid',False)
     return redirect(url_for('index'))
 
 # Login 확인
@@ -215,7 +201,7 @@ def check():
     db = pymysql.connect(host='18.212.183.253',
                      port=3306,
                      user='jjoong',
-                     passwd='1234',
+                     passwd='',
                      db='pi',
                      charset='utf8')
 
@@ -237,71 +223,11 @@ def check():
         session['logflag'] = True   
         #auth값으로 일반 사용자 / 관리자 / 구매자 나누기 위해? 
         #근데 세션값으로 다 나눌수 있을꺼같은데..
-        # update_sql = "UPDATE member set auth=1 where id=%s;"
-
-        # cursor.execute(update_sql,id)
-        # db.commit()
-        # db.close()
-
-        #return render_template('login_test.html')
-        #return redirect(url_for('index'))
+       
         return redirect(url_for('please'))
     #로그인 실패시
     else :
-        # update_sql = "UPDATE member set auth=0 where id=%s;"
-
-        # cursor.execute(update_sql,id)
-        # db.commit()
-        # db.close()
-        #return render_template('login.html')
-        #return "아이디 또는 패스워드를 확인 하세요."
         return redirect(url_for('login'))
-        
-# #cctv 등록 화면
-# @app.route("/cctv_register_Form")
-# def cctv_register_Form():
-#     return render_template('cctv_register_Form.html')
-
-# #cctv 테스트
-# @app.route("/search")
-# def search():
-#     return render_template('search.html')
-
-# @app.route("/search_test", methods=['POST'])
-# def search_test():
-#     latitude = request.form["latitude"]
-#     longitude = request.form["longitude"]
-
-#     x = latitude + longitude
-
-#     return x
-
-# #회원용 cctv 관리-----------------
-# #각자 자신이 등록한 cctv 정보 보여주기 - 회원용 cctv 관리
-# @app.route("/cctv_Management")
-# def cctv_Management():
-#     mem_id = session['userid']
-
-#     db = pymysql.connect(host='18.212.183.253',
-#                      port=3306,
-#                      user='jjoong',
-#                      passwd='1234',
-#                      db='pi',
-#                      charset='utf8')
-
-#     cursor = db.cursor()
-
-#     sql = "SELECT cctv_name, latitude, longitude FROM cctv WHERE mem_id = %s;"
-#     cursor.execute(sql,mem_id)
-#     row = cursor.fetchall()
-#     db.close()
-
-#     if row:
-#         return redirect(url_for('please'), Data = row)
-#         #return mem_id
-#         #return render_template('cctv_management.html',resultData = row)
-#     else:
-#         return "등록한 cctv가 없습니다."
 
 
 #자신의 cctv 정보를 수정하는 페이지로 이동
@@ -325,7 +251,7 @@ def cctv_modify():
     db = pymysql.connect(host='18.212.183.253',
                      port=3306,
                      user='jjoong',
-                     passwd='1234',
+                     passwd='',
                      db='pi',
                      charset='utf8')
 
@@ -349,7 +275,7 @@ def delete_cctv():
     db = pymysql.connect(host='18.212.183.253',
                      port=3306,
                      user='jjoong',
-                     passwd='1234',
+                     passwd='',
                      db='pi',
                      charset='utf8')
 
@@ -376,7 +302,7 @@ def delete_cctv():
 #     db = pymysql.connect(host='18.212.183.253',
 #                      port=3306,
 #                      user='jjoong',
-#                      passwd='1234',
+#                      passwd='',
 #                      db='pi',
 #                      charset='utf8')
 
@@ -407,7 +333,7 @@ def Authorization():
     db = pymysql.connect(host='18.212.183.253',
                      port=3306,
                      user='jjoong',
-                     passwd='1234',
+                     passwd='',
                      db='pi',
                      charset='utf8')
 
@@ -436,7 +362,7 @@ def cctv_insert():
     db = pymysql.connect(host='18.212.183.253',
                      port=3306,
                      user='jjoong',
-                     passwd='1234',
+                     passwd='',
                      db='pi',
                      charset='utf8')
 
@@ -491,7 +417,7 @@ def member_insert():
     db = pymysql.connect(host='18.212.183.253',
                      port=3306,
                      user='jjoong',
-                     passwd='1234',
+                     passwd='',
                      db='pi',
                      charset='utf8')
 
@@ -526,7 +452,7 @@ def ID_check():
     db = pymysql.connect(host='18.212.183.253',
                      port=3306,
                      user='jjoong',
-                     passwd='1234',
+                     passwd='',
                      db='pi',
                      charset='utf8')
 
@@ -561,7 +487,7 @@ def data():
         smtp_gmail.starttls()
 
         #로그인
-        smtp_gmail.login('rlawndwo123@gmail.com', 'Kj!2160427')
+        smtp_gmail.login('rlawndwo123@gmail.com', '')
 
         msg=EmailMessage()
     
@@ -599,7 +525,7 @@ def data1():
         smtp_gmail.starttls()
 
         #로그인
-        smtp_gmail.login('rlawndwo123@gmail.com', 'Kj!2160427')
+        smtp_gmail.login('rlawndwo123@gmail.com', '')
 
         msg=EmailMessage()
     
